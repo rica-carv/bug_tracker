@@ -33,10 +33,10 @@ include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
 // Plugin info -------------------------------------------------------------------------------------------------------
 $eplug_name = 'Bug Tracker';
 $eplug_version = '1.4 RC b';
-$eplug_author = 'Father Barry (customized by rica-carv @ https://github.com/rica-carv)';
+$eplug_author = 'Father Barry';
 $eplug_url = 'http://keal.me.uk';
 $eplug_email = '';
-$eplug_description = BUGTRACK_A114;
+$eplug_description = BUGTRACK_A114." (updated & customized by rica-carv @ https://github.com/rica-carv)";
 $eplug_compatible = 'e107v7';
 $eplug_readme = 'admin_readme.php';	// leave blank if no readme file
 $eplug_compliant=TRUE;
