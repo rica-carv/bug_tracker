@@ -8,8 +8,8 @@ global $PLUGINS_DIRECTORY;
 /**
  * * Get the main requires out of the way
  */
-include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
-
+//////////include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
+e107::lan('bug_tracker');
 // get template
 
 if (!defined('USER_WIDTH'))
