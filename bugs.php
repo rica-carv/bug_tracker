@@ -16,6 +16,7 @@ if (!is_object($bugtrack_obj))
     $bugtrack_obj = new bugtracker;
 }
 // get template
+/*
 if (is_readable(THEME . 'bugs_template.php'))
 {
     define('BUGTRACK_THEME', THEME . 'bugs_template.php');
@@ -24,6 +25,9 @@ else
 {
     define('BUGTRACK_THEME', e_PLUGIN . 'bug_tracker/templates/bugs_template.php');
 }
+*/
+//$HDU_LISTTICKETS = e107::getTemplate('bug_tracker', 'bugs_template');
+$bugs_template = e107::getTemplate('bug_tracker', 'bugs');
 
 define('BUGTRACK_IMAGES', SITEURL . $PLUGINS_DIRECTORY . 'bug_tracker');
 require_once(e_PLUGIN . 'bug_tracker/includes/bugs_shortcodes.php');
@@ -135,8 +139,9 @@ switch ($bugtrack_action)
                     $sql->db_Update('bugtrack_bugs', $bugtrack_arg, false);
                     bugtrack_notify($bugtrack_bugid, $bugtrack_bugapp, 'change');
                 }
-                require_once(BUGTRACK_THEME);
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_OPTSUBMITTED_HEADER, false, $bugs_shortcodes);
+////////                require_once(BUGTRACK_THEME);
+////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_OPTSUBMITTED_HEADER, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['OPTSUBMITTED_HEADER'], false, $bugs_shortcodes);
                 if ($BUGTRACK_PREF['cachestatus'] == 1)
                 {
                     $e107cache->clear('nq_bugstrack');
@@ -212,8 +217,9 @@ switch ($bugtrack_action)
                     $row = $sql->db_Fetch();
                     extract($row);
                 }
-                require_once(BUGTRACK_THEME);
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_OPT_FORM, false, $bugs_shortcodes);
+/////////////                require_once(BUGTRACK_THEME);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_OPT_FORM, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['OPT_FORM'], false, $bugs_shortcodes);
                 $bugtrack_text .= '</form>';
             }
         }
@@ -251,8 +257,9 @@ switch ($bugtrack_action)
                     $bugtrak_inserted = $sql->db_Insert('bugtrack_bugs', $bugtrack_arg, false);
                 }
                 bugtrack_notify($bugtrak_inserted, $bugtrack_bugapp, 'new');
-                require_once(BUGTRACK_THEME);
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMITTED_HEADER, false, $bugs_shortcodes);
+/////////////                require_once(BUGTRACK_THEME);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMITTED_HEADER, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['SUBMITTED_HEADER'], false, $bugs_shortcodes);
                 $bugtrack_sn = array('user' => USERNAME, 'itemtitle' => $_POST['bugtrack_name'], 'catid' => intval($bugtrak_inserted));
                 $e_event->trigger('bugpost', $bugtrack_sn);
                 $e107cache->clear('nq_bugstrack');
@@ -318,8 +325,9 @@ switch ($bugtrack_action)
 				<input type='hidden' name='subbed' value='no' />
 				<input type='hidden' name='bugtrack_action' value='submitit' />
 			</div>";
-                require_once(BUGTRACK_THEME);
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMIT_FORM, false, $bugs_shortcodes);
+/////////////                require_once(BUGTRACK_THEME);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMIT_FORM, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['SUBMIT_FORM'], false, $bugs_shortcodes);
 
                 $bugtrack_text .= '</form>';
             }
@@ -327,8 +335,9 @@ switch ($bugtrack_action)
         break;
     case 'item':
         {
-            require_once(BUGTRACK_THEME);
-            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_HEADER, false, $bugs_shortcodes);
+/////////////            require_once(BUGTRACK_THEME);
+/////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMIT_FORM, false, $bugs_shortcodes);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_HEADER'], false, $bugs_shortcodes);
             $bugtrack_arg = '
 			select * from #bugtrack_bugs
 			left join #bugtrack_apps on bugtrack_app_id=bugtrack_category
@@ -340,7 +349,8 @@ switch ($bugtrack_action)
                 extract($bugtrack_row);
                 $bugtrack_tmp = explode('.', $bugtrack_author);
                 $bugtrack_aname = $bugtrack_tmp[1];
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_LIST, false, $bugs_shortcodes);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_LIST, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_LIST'], false, $bugs_shortcodes);
             }
             else
             {
@@ -351,7 +361,8 @@ switch ($bugtrack_action)
 		<tr>
 			<td class="fcaption" colspan="2"><a href="?$0.show.0.0.0">' . BUGTRACK_15 . '</a></td></tr>';
             }
-            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_FOOTER, false, $bugs_shortcodes);
+//////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_FOOTER, false, $bugs_shortcodes);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_FOOTER'], false, $bugs_shortcodes);
             $bugtrack_page = $bugtrack_app_name . ' #' . $bugtrack_id;
             $bugtrack_comon = true;
         }
@@ -405,8 +416,9 @@ switch ($bugtrack_action)
 		<input type="hidden" name="bugtrack_bugapp" value="' . $bugtrack_bugapp . '" />
 	</div>
 			';
-            require_once(BUGTRACK_THEME);
-            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_HEADER, false, $bugs_shortcodes);
+/////////////            require_once(BUGTRACK_THEME);
+/////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_HEADER, false, $bugs_shortcodes);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_HEADER'], false, $bugs_shortcodes);
             // print $bugtrack_fad;
             $bugtrack_arg = "
 			select * from #bugtrack_bugs
@@ -424,7 +436,8 @@ switch ($bugtrack_action)
                     $bugtrack_bugid = $bugtrack_id;
                     $bugtrack_tmp = explode(".", $bugtrack_author);
                     $bugtrack_aname = $bugtrack_tmp[1];
-                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_LIST, false, $bugs_shortcodes);
+//////////////                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_LIST, false, $bugs_shortcodes);
+                    $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_LIST'], false, $bugs_shortcodes);
                 }
             }
             else
@@ -437,7 +450,8 @@ switch ($bugtrack_action)
             $bugtrack_count = $sql->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_bugapp, false);
             $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_perpage'];
             $bugtrack_npa = 'view';
-            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_FOOTER, false, $bugs_shortcodes);
+//////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_FOOTER, false, $bugs_shortcodes);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_FOOTER'], false, $bugs_shortcodes);
         }
         $bugtrack_text .= '
 </form>';
@@ -453,8 +467,9 @@ switch ($bugtrack_action)
             }
             else
             {
-                require_once(BUGTRACK_THEME);
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_TABLE, false, $bugs_shortcodes);
+/////////////                require_once(BUGTRACK_THEME);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_TABLE, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_TABLE'], false, $bugs_shortcodes);
                 $bugtrack_arg = "select a.*,b.user_name from #bugtrack_apps as a
             left join #user as b on bugtrack_app_developer=user_id
             order by bugtrack_app_name
@@ -470,18 +485,21 @@ switch ($bugtrack_action)
                         $bugtrack_pending = $sql2->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_app_id . ' and bugtrack_status=2', false);
                         $bugtrack_total = $bugtrack_open + $bugtrack_closed + $bugtrack_pending;
                         $bugtrack_bugapp = $bugtrack_app_id;
-                        $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_LIST, false, $bugs_shortcodes);
+/////////////                        $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_LIST, false, $bugs_shortcodes);
+                        $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_LIST'], false, $bugs_shortcodes);
                     } // while
                 }
                 else
                 {
-                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_NOBUG, false, $bugs_shortcodes);
+/////////////                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_NOBUG, false, $bugs_shortcodes);
+                    $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_NOBUG'], false, $bugs_shortcodes);
                 }
 
                 $bugtrack_count = $sql->db_Count('bugtrack_apps', '(*)');
                 $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_inmenu'];
                 $bugtrack_npa = 'show';
-                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_FOOTER, false, $bugs_shortcodes);
+/////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_FOOTER, false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_FOOTER'], false, $bugs_shortcodes);
                 $bugtrack_page = BUGTRACK_9;
                 require_once(HEADERF);
 
