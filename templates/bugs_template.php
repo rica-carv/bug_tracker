@@ -16,11 +16,11 @@ if (!defined("e107_INIT"))
     exit;
 }
 
-if (!isset($BUGTRACK_LIST_TABLE))
+if (!isset($BUGS_TEMPLATE['LIST_TABLE']))
 {
     // The main heading for the bugs list
     // displayed second
-    $BUGTRACK_LIST_TABLE = '
+    $BUGS_TEMPLATE['LIST_TABLE'] = '
 <table style="' . USER_WIDTH . '">
 		<tr>
 			<td class="fcaption" colspan="4">' . BUGTRACK_9 . '</td>
@@ -37,10 +37,10 @@ if (!isset($BUGTRACK_LIST_TABLE))
 }
 // *
 // *
-if (!isset($BUGTRACK_LIST_LIST))
+if (!isset($BUGS_TEMPLATE['LIST_LIST']))
 {
     // The list of bugs number of bugs is set in admin config
-    $BUGTRACK_LIST_LIST = '
+    $BUGS_TEMPLATE['LIST_LIST'] = '
 	<tr>
 		<td class="forumheader3" style="vertical-align:center;text-align:center;" >{BUGTRACK_ICON}</td>
 		<td class="forumheader3" style="vertical-align:top;" >{BUGTRACK_APPNAME=link}<br />{BUGTRACK_APPDESC}<br /><br /> {BUGTRACK_DOWNLOAD} {BUGTRACK_FORUM}</td>
@@ -49,19 +49,19 @@ if (!isset($BUGTRACK_LIST_LIST))
 	</tr>';
 }
 // *
-if (!isset($BUGTRACK_LIST_NOBUG))
+if (!isset($BUGS_TEMPLATE['LIST_NOBUG']))
 {
     // No bugs to display
-    $BUGTRACK_LIST_NOBUG .= '
+    $BUGS_TEMPLATE['LIST_NOBUG'] .= '
 	<tr>
 		<td class="forumheader3" colspan="5">' . BUGTRACK_8 . '</td>
 	</tr>';
 }
 // *
-if (!isset($BUGTRACK_LIST_FOOTER))
+if (!isset($BUGS_TEMPLATE['LIST_FOOTER']))
 {
 
-    $BUGTRACK_LIST_FOOTER .= '
+    $BUGS_TEMPLATE['LIST_FOOTER'] .= '
     <tr>
 		<td colspan="4" class="fcaption" >{BUGTRACK_LISTNP=show}&nbsp;</td>
 	</tr>
@@ -71,9 +71,9 @@ if (!isset($BUGTRACK_LIST_FOOTER))
 // *
 // * Display Bugs
 // *
-if (!isset($BUGTRACK_SHOW_HEADER))
+if (!isset($BUGS_TEMPLATE['SHOW_HEADER']))
 {
-    $BUGTRACK_SHOW_HEADER = '
+    $BUGS_TEMPLATE['SHOW_HEADER'] = '
 <table style="' . USER_WIDTH . '" class="fborder">
 	<tr>
 		<td class="fcaption" colspan="7">' . BUGTRACK_15 . ' {BUGTRACK_APPNAME}</td>
@@ -95,9 +95,9 @@ if (!isset($BUGTRACK_SHOW_HEADER))
 	</tr>';
 }
 // *
-if (!isset($BUGTRACK_SHOW_LIST))
+if (!isset($BUGS_TEMPLATE['SHOW_LIST']))
 {
-    $BUGTRACK_SHOW_LIST .= '<tr>
+    $BUGS_TEMPLATE['SHOW_LIST'] .= '<tr>
 		<td class="forumheader3" style="width:10%;vertical-align:top;">{BUGTRACK_ID}</td>
 		<td class="forumheader3" style="width:20%;vertical-align:top;">{BUGTRACK_NAME=link}</td>
 		<td class="forumheader3" style="width:20%;vertical-align:top;">{BUGTRACK_POSTER}</td>
@@ -109,9 +109,9 @@ if (!isset($BUGTRACK_SHOW_LIST))
 ';
 }
 // *
-if (!isset($BUGTRACK_SHOW_FOOTER))
+if (!isset($BUGS_TEMPLATE['SHOW_FOOTER']))
 {
-    $BUGTRACK_SHOW_FOOTER = '
+    $BUGS_TEMPLATE['SHOW_FOOTER'] = '
     <tr>
 		<td colspan="7" class="fcaption" >{BUGTRACK_LISTNP}&nbsp;</td>
 	</tr>
@@ -120,9 +120,9 @@ if (!isset($BUGTRACK_SHOW_FOOTER))
 // *
 // *
 // *
-if (!isset($BUGTRACK_ITEM_HEADER))
+if (!isset($BUGS_TEMPLATE['ITEM_HEADER']))
 {
-    $BUGTRACK_ITEM_HEADER = '
+    $BUGS_TEMPLATE['ITEM_HEADER'] = '
 <table style="' . USER_WIDTH . '" class="fborder">
 	<tr>
 		<td class="fcaption" colspan="2">' . BUGTRACK_44 . '</td>
@@ -132,9 +132,9 @@ if (!isset($BUGTRACK_ITEM_HEADER))
 	</tr>';
 }
 // *
-if (!isset($BUGTRACK_ITEM_LIST))
+if (!isset($BUGS_TEMPLATE['ITEM_LIST']))
 {
-    $BUGTRACK_ITEM_LIST = '
+    $BUGS_TEMPLATE['ITEM_LIST'] = '
 	<tr>
 		<td class="forumheader3" style="width:20%;vertical-align:top;">' . BUGTRACK_17 . '</td>
 		<td class="forumheader3" style="width:80%;vertical-align:top;">{BUGTRACK_POSTER}</td>
@@ -173,13 +173,13 @@ if (!isset($BUGTRACK_ITEM_LIST))
 	</tr>	';
     if ($bugtrack_obj->bugtracker_dev || $bugtrack_obj->bugtracker_admin)
     {
-        $BUGTRACK_ITEM_LIST .= '
+        $BUGS_TEMPLATE['ITEM_LIST'] .= '
 	<tr>
 		<td class="forumheader3" style="width:20%;vertical-align:top;">' . BUGTRACK_23 . '</td>
 		<td class="forumheader3" style="width:80%;vertical-align:top;">{BUGTRACK_ADMINCOMMENT}</td>
 	</tr>';
     }
-    $BUGTRACK_ITEM_LIST .= '
+    $BUGS_TEMPLATE['ITEM_LIST'] .= '
 	<tr>
 		<td class="forumheader3" style="width:20%;vertical-align:top;">' . BUGTRACK_24 . '</td>
 		<td class="forumheader3" style="width:80%;vertical-align:top;">{BUGTRACK_FLAG}</td>
@@ -190,9 +190,9 @@ if (!isset($BUGTRACK_ITEM_LIST))
 	</tr>';
 }
 // *
-if (!isset($BUGTRACK_ITEM_FOOTER))
+if (!isset($BUGS_TEMPLATE['ITEM_FOOTER']))
 {
-    $BUGTRACK_ITEM_FOOTER = '
+    $BUGS_TEMPLATE['ITEM_FOOTER'] = '
 	<tr>
 		<td colspan="2" class="forumheader3" style="width:80%;vertical-align:top;">{BUGTRACK_OPTIONS}</td>
 	</tr>
@@ -208,9 +208,9 @@ if (!isset($BUGTRACK_ITEM_FOOTER))
 // *
 // *
 // *
-if (!isset($BUGTRACK_SUBMITTED_HEADER))
+if (!isset($BUGS_TEMPLATE['SUBMITTED_HEADER']))
 {
-    $BUGTRACK_SUBMITTED_HEADER = '
+    $BUGS_TEMPLATE['SUBMITTED_HEADER'] = '
 	<div class="fborder" style="' . USER_WIDTH . '" >
 	<table style="' . USER_WIDTH . '" >
 		<tr>
@@ -230,9 +230,9 @@ if (!isset($BUGTRACK_SUBMITTED_HEADER))
 // *
 // *
 // *
-if (!isset($BUGTRACK_SUBMIT_FORM))
+if (!isset($BUGS_TEMPLATE['SUBMIT_FORM']))
 {
-    $BUGTRACK_SUBMIT_FORM = '
+    $BUGS_TEMPLATE['SUBMIT_FORM'] = '
 <div class="fborder" style="' . USER_WIDTH . '" >
 		<table style="' . USER_WIDTH . '">
 			<tr>
@@ -268,9 +268,9 @@ if (!isset($BUGTRACK_SUBMIT_FORM))
 		</div>';
 }
 
-if (!isset($BUGTRACK_OPT_FORM))
+if (!isset($BUGS_TEMPLATE['OPT_FORM']))
 {
-    $BUGTRACK_OPT_FORM = '
+    $BUGS_TEMPLATE['OPT_FORM'] = '
 <table style="' . USER_WIDTH . '" class="fborder">
 	<tr>
 		<td class="fcaption" colspan="2">' . BUGTRACK_40 . '</td>
@@ -327,9 +327,9 @@ if (!isset($BUGTRACK_OPT_FORM))
 	</tr>
 </table>';
 }
-if (!isset($BUGTRACK_OPTSUBMITTED_HEADER))
+if (!isset($BUGS_TEMPLATE['OPTSUBMITTED_HEADER']))
 {
-    $BUGTRACK_OPTSUBMITTED_HEADER = '
+    $BUGS_TEMPLATE['OPTSUBMITTED_HEADER'] = '
 <table style="' . USER_WIDTH . '" class="fborder">
 	<tr>
 		<td class="fcaption" >' . BUGTRACK_36 . '</td>
@@ -345,5 +345,3 @@ if (!isset($BUGTRACK_OPTSUBMITTED_HEADER))
 	</tr>
 </table>';
 }
-
-?>
