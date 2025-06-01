@@ -23,9 +23,9 @@ if (!getperms('P'))
 }
 require_once(e_HANDLER . 'userclass_class.php');
 require_once(e_ADMIN . 'auth.php');
-require_once(e_PLUGIN . 'bug_tracker/includes/bugtracker_class.php');
 if (!is_object($bugtrack_obj))
 {
+	require_once(e_PLUGIN . 'bug_tracker/includes/bugtracker_class.php');
     $bugtrack_obj = new bugtracker;
 }
 

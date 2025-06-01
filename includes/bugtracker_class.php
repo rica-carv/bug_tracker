@@ -23,8 +23,12 @@ class bugtracker
     var $bugtracker_creator = false; //
     var $bugtracker_reader = false; //
     var $bugtracker_dev = false; //
+    var $bugtracker_sql = false; //
     function __construct()
     {
+//        e107::lan('bug_tracker');
+        $this->bugtracker_sql = e107::getDb();
+
         global $BUGTRACK_PREF;
         $this->load_prefs();
 
@@ -64,34 +68,38 @@ class bugtracker
     }
     function save_prefs()
     {
-        global $sql, $eArrayStorage, $BUGTRACK_PREF;
+        global $eArrayStorage, $BUGTRACK_PREF;
         // save preferences to database
+/*
         if (!is_object($sql))
         {
             $sql = new db;
         }
+*/
         $tmp = $eArrayStorage->WriteArray($BUGTRACK_PREF);
-        $sql->db_Update('core', 'e107_value="'.$tmp.'" where e107_name="bugtracker"', false);
+        $this->bugtracker_sql->update('core', 'e107_value="'.$tmp.'" where e107_name="bugtracker"', false);
         return ;
     }
     function load_prefs()
     {
-        global $sql, $eArrayStorage, $BUGTRACK_PREF;
+        global $eArrayStorage, $BUGTRACK_PREF;
         // get preferences from database
+/*
         if (!is_object($sql))
         {
             $sql = new db;
         }
-        $num_rows = $sql->db_Select('core', '*', 'e107_name="bugtracker"');
-        $row = $sql->db_Fetch();
+ */
+        $num_rows = $this->bugtracker_sql->select('core', '*', 'e107_name="bugtracker"');
+        $row = $this->bugtracker_sql->fetch();
 
         if (empty($row['e107_value']))
         {
             // insert default preferences if none exist
             $this->getDefaultPrefs();
             $tmp = $eArrayStorage->WriteArray($BUGTRACK_PREF);
-            $sql->db_Insert('core', "'bugtracker', '$tmp' ");
-            $sql->db_Select('core', '*', 'e107_name="bugtracker"');
+            $this->bugtracker_sql->insert('core', "'bugtracker', '$tmp' ");
+            $this->bugtracker_sql->select('core', '*', 'e107_name="bugtracker"');
         }
         else
         {

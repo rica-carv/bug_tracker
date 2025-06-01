@@ -29,7 +29,8 @@
 // *		Support at	:	www.keal.me.uk
 // *
 // ***************************************************************
-include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
+//////////////include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
+e107::lan('bug_tracker', 'admin', true);
 // Plugin info -------------------------------------------------------------------------------------------------------
 $eplug_name = 'Bug Tracker';
 $eplug_version = '1.4 RC b';
@@ -93,4 +94,3 @@ $upgrade_remove_prefs = '';
 $upgrade_alter_tables = '';
 
 $eplug_upgrade_done = '';
-?>

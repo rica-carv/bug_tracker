@@ -5,10 +5,9 @@
 // *
 // **************************************************************************
 require_once('../../class2.php');
-if (!defined('e107_INIT'))
-{
-    exit;
-}
+if (!defined('e107_INIT')){    exit;}
+
+$msg = e107::getMessage();
 
 if (!is_object($bugtrack_obj))
 {
@@ -28,7 +27,8 @@ else
 */
 //$HDU_LISTTICKETS = e107::getTemplate('bug_tracker', 'bugs_template');
 $bugs_template = e107::getTemplate('bug_tracker', 'bugs');
-
+//$sql_bug = e107::getDb();
+//$sql2_bug = e107::getDb();
 define('BUGTRACK_IMAGES', SITEURL . $PLUGINS_DIRECTORY . 'bug_tracker');
 //////////////require_once(e_PLUGIN . 'bug_tracker/includes/bugs_shortcodes.php');
 $bugs_shortcodes = e107::getScBatch('bugs', 'bug_tracker');
@@ -328,7 +328,7 @@ switch ($bugtrack_action)
 			</div>";
 /////////////                require_once(BUGTRACK_THEME);
 /////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMIT_FORM, false, $bugs_shortcodes);
-                $bugtrack_text .= $tp->parseTemplate($bugs_template['SUBMIT_FORM'], false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['SUBMIT_FORM'], true, $bugs_shortcodes);
 
                 $bugtrack_text .= '</form>';
             }
@@ -338,7 +338,7 @@ switch ($bugtrack_action)
         {
 /////////////            require_once(BUGTRACK_THEME);
 /////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SUBMIT_FORM, false, $bugs_shortcodes);
-            $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_HEADER'], false, $bugs_shortcodes);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_HEADER'], true, $bugs_shortcodes);
             $bugtrack_arg = '
 			select * from #bugtrack_bugs
 			left join #bugtrack_apps on bugtrack_app_id=bugtrack_category
@@ -351,7 +351,7 @@ switch ($bugtrack_action)
                 $bugtrack_tmp = explode('.', $bugtrack_author);
                 $bugtrack_aname = $bugtrack_tmp[1];
 /////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_ITEM_LIST, false, $bugs_shortcodes);
-                $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_LIST'], false, $bugs_shortcodes);
+                $bugtrack_text .= $tp->parseTemplate($bugs_template['ITEM_LIST'], true, $bugs_shortcodes);
             }
             else
             {
@@ -405,9 +405,11 @@ switch ($bugtrack_action)
                     $bugtrack_fassigned = $_POST['bugtrack_fassigned'];
                 }
             }
-            $sql->db_Select('bugtrack_apps', '*', 'where bugtrack_app_id=' . $bugtrack_bugapp, 'nowhere', false);
-            $bugtrack_row = $sql->db_Fetch();
+            
+///            var_dump($bugtrack_bugapp);
+            $bugtrack_row = $sql->retrieve('bugtrack_apps', '*', 'bugtrack_app_id=' . $bugtrack_bugapp);
             extract($bugtrack_row);
+///            var_dump($bugtrack_row);
             $bugtrack_text .= '
 <form id="bugfilt" action="' . e_SELF . '" method="post">
 	<div>
@@ -419,7 +421,9 @@ switch ($bugtrack_action)
 			';
 /////////////            require_once(BUGTRACK_THEME);
 /////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_HEADER, false, $bugs_shortcodes);
-            $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_HEADER'], false, $bugs_shortcodes);
+/////////            $row['bugtrack_app_name'] = $bugtrack_app_name;
+            $bugs_shortcodes->addVars($bugtrack_row);
+            $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_HEADER'], true, $bugs_shortcodes);
             // print $bugtrack_fad;
             $bugtrack_arg = "
 			select * from #bugtrack_bugs
@@ -428,15 +432,18 @@ switch ($bugtrack_action)
 			where bugtrack_category='$bugtrack_bugapp'" . $bugtrack_fad . "
 			order by bugtrack_id desc
 			limit " . $bugtrack_from . ',' . $BUGTRACK_PREF['bugtrack_perpage'];
-            if ($sql->db_Select_gen($bugtrack_arg, false))
+            if ($sql->gen($bugtrack_arg))
             {
-                while ($bugtrack_row = $sql->db_Fetch())
+                while ($bugtrack_row = $sql->fetch())
                 {
+//                    var_dump($bugtrack_row);
+//                    echo "<hr>";
                     extract($bugtrack_row);
                     $bugtrack_bugapp = $bugtrack_category;
                     $bugtrack_bugid = $bugtrack_id;
                     $bugtrack_tmp = explode(".", $bugtrack_author);
                     $bugtrack_aname = $bugtrack_tmp[1];
+
 //////////////                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_LIST, false, $bugs_shortcodes);
                     $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_LIST'], false, $bugs_shortcodes);
                 }
@@ -471,27 +478,47 @@ switch ($bugtrack_action)
 /////////////                require_once(BUGTRACK_THEME);
 /////////////                $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_TABLE, false, $bugs_shortcodes);
 /////////////                $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_TABLE'], true, $bugs_shortcodes);
-                $bugtrack_arg = "select a.*,b.user_name from #bugtrack_apps as a
-            left join #user as b on bugtrack_app_developer=user_id
-            order by bugtrack_app_name
-			limit " . $bugtrack_from . "," . $BUGTRACK_PREF['bugtrack_inmenu'];
-                if ($sql->db_Select_gen($bugtrack_arg, false))
+            $bugtrack_arg = "SELECT a.*,b.user_name FROM `#bugtrack_apps` AS a
+            LEFT JOIN `#user` AS b ON bugtrack_app_developer = user_id
+            ORDER BY bugtrack_app_name
+			LIMIT " . $bugtrack_from . "," . $BUGTRACK_PREF['bugtrack_inmenu'];
+///            var_dump($bugtrack_arg);
+///            echo "<hr>";
+
+            if ($sql->gen($bugtrack_arg))
+
+////////                if ($sql->select("bugtrack_apps", "*"))
                 {
+//                    var_dump($sql);
+//                    echo "<hr>";
                     $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_TABLE'], true, $bugs_shortcodes);
-                    while ($bugtrack_row = $sql->db_Fetch())
+                    while ($row = $sql->fetch())
                     {
-                        extract($bugtrack_row);
+///                        var_dump($row);
+///                        echo "<hr>";
+//                        extract($row);
                         // Count up the statistics
-                        $bugtrack_open = $sql2->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_app_id . ' and bugtrack_status=1', false);
-                        $bugtrack_closed = $sql2->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_app_id . ' and bugtrack_status=3', false);
-                        $bugtrack_pending = $sql2->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_app_id . ' and bugtrack_status=2', false);
+/*
+                        $bugtrack_open = $sql2->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $bugtrack_app_id . '" and bugtrack_status=1');
+                        $bugtrack_closed = $sql2->db_Count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $bugtrack_app_id . '" and bugtrack_status=3', false);
+                        $bugtrack_pending = $sql2->db_Count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $bugtrack_app_id . '" and bugtrack_status=2', false);
                         $bugtrack_total = $bugtrack_open + $bugtrack_closed + $bugtrack_pending;
+
                         $bugtrack_bugapp = $bugtrack_app_id;
+*/
+                        $row['open_bugs'] = $sql2->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $row['bugtrack_app_id'] . '" and bugtrack_status=1');
+                        $row['closed_bugs'] = $sql2->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $row['bugtrack_app_id'] . '" and bugtrack_status=3');
+                        $row['pending_bugs'] = $sql2->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $row['bugtrack_app_id'] . '" and bugtrack_status=2');
+
+                        $row['bugtrack_bugid'] = $bugtrack_bugid;
+                        $row['bugtrack_from'] = $bugtrack_from;
+                        $bugs_shortcodes->addVars($row);
+//                        $bugs_shortcodes->prepareFromVars();    
 /////////////                        $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_LIST, false, $bugs_shortcodes);
                         $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_LIST'], false, $bugs_shortcodes);
                     } // while
 
-                    $bugtrack_count = $sql->db_Count('bugtrack_apps', '(*)');
+                    $bugtrack_count = $sql2->count('bugtrack_apps', '(*)');
                     $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_inmenu'];
                     $bugtrack_npa = 'show';
                     $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_FOOTER'], false, $bugs_shortcodes);
@@ -500,8 +527,9 @@ switch ($bugtrack_action)
                 else
                 {
 /////////////                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_LIST_NOBUG, false, $bugs_shortcodes);
-                    e107::getMessage()->add($tp->parseTemplate($bugs_template['LIST_NOBUG'], true, $bugs_shortcodes), E_MESSAGE_INFO);
-                    $bugtrack_text .= e107::getMessage()->render();
+                    if (ADMIN) $msg->addwarning("Ainda não tem aplicações definidas!!!");
+                    $msg->addinfo($tp->parseTemplate($bugs_template['LIST_NOBUG'], true, $bugs_shortcodes));
+                    $bugtrack_text .= $msg->render();
 /////////////                    $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_NOBUG'], true, $bugs_shortcodes);
                 }
 
@@ -522,7 +550,7 @@ switch ($bugtrack_action)
 } // switch
 if ($bugtrack_action != 'show')
 {
-    define('e_PAGETITLE', BUGTRACK_85 . ' - ' . $bugtrack_page);
+    define('e_PAGETITLE', BUGTRACK_75 . ' - ' . $bugtrack_page);
     if (!empty($BUGTRACK_PREF['bugtrack_metad']))
     {
         define('META_DESCRIPTION', $BUGTRACK_PREF['bugtrack_metad']);

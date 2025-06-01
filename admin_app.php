@@ -91,7 +91,8 @@ if ($bugtrack_action == 'update')
 
 	if (count($_FILES) > 0)
     {
-        while (list($key, $value) = each($_FILES['bugtrack_icon']['name']))
+/////////        while (list($key, $value) = each($_FILES['bugtrack_icon']['name']))
+        foreach ($_FILES['bugtrack_icon']['name'] as $key => $value)
         {
             // Check if it is a blank field, if so then skip
             if (!empty($value))

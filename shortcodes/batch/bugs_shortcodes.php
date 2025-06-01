@@ -2,20 +2,65 @@
 if (!defined('e107_INIT')) exit;
 
 //include_once(e_HANDLER . 'shortcode_handler.php');
-//$bugs_shortcodes = $tp->e_sc->parse_scbatch(__FILE__);
+//$bugs_shortcodes = $this->tp->e_sc->parse_scbatch(__FILE__);
 
 class plugin_bug_tracker_bugs_shortcodes extends e_shortcode
 {
+    private $sql;
+    private $tp;
+    private $frm;
+    private $bugStats = [];
+    function __construct()
+    {
+//  $this->pluginPrefs = e107::pref('helpdesk');
+        $this->sql = e107::getDB();
+        $this->tp = e107::getParser();
+        $this->frm = e107::getForm();
 
+//        var_dump($this->getVars());
+//        $this->sql->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $this->var['bugtrack_app_id'] . '" and bugtrack_status=100');
+/*
+$bugtrack_closed = $sql2->db_Count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $bugtrack_app_id . '" and bugtrack_status=3', false);
+$bugtrack_pending = $sql2->db_Count('bugtrack_bugs', '(*)', 'bugtrack_category="' . $bugtrack_app_id . '" and bugtrack_status=2', false);
+$bugtrack_total = $bugtrack_open + $bugtrack_closed + $bugtrack_pending;
+*/
+    }
+/*
+    public function addVars($data)
+    {
+        parent::addVars($data);
 
-function sc_BUGTRACK_F_GO ()
+        if (method_exists($this, 'prepareFromVars')) {
+            $this->prepareFromVars();
+        }
+    }
+*/
+/*
+    public function prepareFromVars()
+    {
+        var_dump($this->getVars());
+        var_dump($this->var['bugtrack_app_id']);
+///        parent::addVars($data); // necessário para $this->var ser definido
+        var_dump($this->var['bugtrack_app_id']);
+        echo "<<hr>";
+
+        $appId = $this->var['bugtrack_app_id'] ?? null;
+
+        if ($appId) {
+            $this->bugStats['open'] = $this->sql->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . intval($appId) . '" AND bugtrack_status=1');
+            $this->bugStats['closed'] = $this->sql->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . intval($appId) . '" AND bugtrack_status=3');
+            $this->bugStats['pending'] = $this->sql->count('bugtrack_bugs', '(*)', 'bugtrack_category="' . intval($appId) . '" AND bugtrack_status=2');
+        }
+    }
+*/
+function sc_bugtrack_f_go ()
 {
-return '<input class="tbox" name="bugfilter" type="submit" value="'.BUGTRACK_73.'" />';
+    return '<input class="tbox" name="bugfilter" type="submit" value="'.BUGTRACK_73.'" />';
 }
 
-function sc_BUGTRACK_F_FILTER ()
+function sc_bugtrack_f_filter ()
 {
-global $tp,$BUGTRACK_PREF,$sql,$bugtrack_fassigned;
+global $BUGTRACK_PREF,$bugtrack_fassigned;
 $retval='<select class="tbox" name="bugtrack_fassigned" onchange="this.form.submit()">';
 $retval.='<option value="0" '.($bugtrack_fassigned==0?'selected="selected"':'').'>'.BUGTRACK_70.'</option>';
 
@@ -24,12 +69,12 @@ $retval.='<option value="-2" '.($bugtrack_fassigned==-2?'selected="selected"':''
 
 $retval.='<option value="-99" disabled="disabled">'.BUGTRACK_71.'</option>';
 
-$sql->db_Select('user','user_name,user_id','where find_in_set("'.$BUGTRACK_PREF['bugtrack_devclass'].'",user_class) order by user_name','nowhere',false);
+$this->sql->db_Select('user','user_name,user_id','where find_in_set("'.$BUGTRACK_PREF['bugtrack_devclass'].'",user_class) order by user_name','nowhere',false);
 
-while ($row=$sql->db_Fetch())
+while ($row=$this->sql->db_Fetch())
 {
 	extract($row);
-	$retval.='<option value="'.$user_id.'"  '.($bugtrack_fassigned==$user_id?'selected="selected"':'').'>'.$tp->toDB($user_name).'</option>';
+	$retval.='<option value="'.$user_id.'"  '.($bugtrack_fassigned==$user_id?'selected="selected"':'').'>'.$this->tp->toDB($user_name).'</option>';
 
 }
 $retval.='</select>';
@@ -37,9 +82,9 @@ return $retval;
 
 }
 
-function sc_BUGTRACK_F_RESOLUTION ()
+function sc_bugtrack_f_resolution ()
 {
-global $tp,$bugtrack_fresolution,$bugtrack_resarray;
+global $bugtrack_fresolution,$bugtrack_resarray;
 
 $retval = "<select class='tbox' name='bugtrack_fresolution' onchange='this.form.submit()'>";
 	$retval.="<option value='-1' ".($bugtrack_fresolution==-1?"selected='selected'":"")." >".BUGTRACK_67."</option>";
@@ -53,9 +98,9 @@ $retval .= "</select>";
 return $retval;
 }
 
-function sc_BUGTRACK_F_STATUS ()
+function sc_bugtrack_f_status ()
 {
-global $tp,$bugtrack_fstatus,$bugtrack_statusarray;
+global $bugtrack_fstatus,$bugtrack_statusarray;
 
 $retval = '<select class="tbox" name="bugtrack_fstatus" onchange="this.form.submit()">';
 $retval.='<option value="-1" '.($bugtrack_fstatus==-1?'selected="selected"':'').' >'.BUGTRACK_68.'</option>';
@@ -69,54 +114,54 @@ $retval .= '</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_ID ()
+
+function sc_bugtrack_id ()
 {
-global $tp,$bugtrack_id;
+global $bugtrack_id;
 return $bugtrack_id;
 }
 
-function sc_BUGTRACK_DEVELOPER ()
+function sc_bugtrack_developer ()
 {
-global $tp,$user_name;
+global $user_name;
 if (empty($user_name))
 {
 	return BUGTRACK_77;
 }
 else
 {
-	return $tp->toHTML($user_name);
+	return $this->tp->toHTML($user_name);
 }
 }
 
-function sc_BUGTRACK_DOWNLOAD ()
+function sc_bugtrack_download ()
 {
-global $tp,$bugtrack_app_dload;
+global $bugtrack_app_dload;
 if (!empty($bugtrack_app_dload))
 {
 return  '<a href="'.$bugtrack_app_dload.'">'.BUGTRACK_56.'</a> ';
 }
 }
 
-function sc_BUGTRACK_FORUM ()
+function sc_bugtrack_forum ()
 {
-global $tp,$bugtrack_app_forum;
+global $bugtrack_app_forum;
 if (!empty($bugtrack_app_forum))
 {
 return  '<a href="'.$bugtrack_app_forum.'">'.BUGTRACK_57.'</a> ';
 }
 }
 
-function sc_BUGTRACK_LISTNP ($parms=null)
+function sc_bugtrack_listnp ($parms=null)
 {
-global $tp, $bugtrack_npa,$sql,$bugtrack_tmpf,$bugtrack_perpage,$bugtrack_count,$bugtrack_action, $bugtrack_from, $bugtrack_bugid, $bugtrack_bugapp, $BUGTRACK_PREF;
-
+global  $bugtrack_npa,$bugtrack_tmpf,$bugtrack_perpage,$bugtrack_count,$bugtrack_action, $bugtrack_from, $bugtrack_bugid, $bugtrack_bugapp, $BUGTRACK_PREF;
 
 $action = "$bugtrack_npa.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf";
 $parms = $bugtrack_count . ',' . $bugtrack_perpage . ',' . $bugtrack_from . ',' . e_SELF . '?' . '[FROM].' . $action;
-return $tp->parseTemplate("{NEXTPREV={$parms}}");
+return $this->tp->parseTemplate("{NEXTPREV={$parms}}");
 }
 
-function sc_BUGTRACK_UPDATED ()
+function sc_bugtrack_updated ()
 {
 global $bugtrak_inserted;
 if ($bugtrak_inserted)
@@ -130,50 +175,52 @@ else
 
 }
 
-function sc_BUGTRACK_OPTSUBMIT ()
+function sc_bugtrack_optsubmit ()
 {
 return '<input type="submit" class="tbox" name="bugtrack_opt" value="' . BUGTRACK_52 . '" />';
 }
 
-function sc_BUGTRACK_DEVFIELD ()
+function sc_bugtrack_devfield ()
 {
-global $tp,$bugtrack_devcomment;
-$retval='<textarea class="tbox" name="bugtrack_devcomment" cols="50" rows="6" style="width:80%" >'.$tp->toFORM($bugtrack_devcomment).'</textarea>';
+global $bugtrack_devcomment;
+$retval='<textarea class="tbox" name="bugtrack_devcomment" cols="50" rows="6" style="width:80%" >'.$this->tp->toFORM($bugtrack_devcomment).'</textarea>';
 return $retval;
 }
 
-function sc_BUGTRACK_ADMINFIELD ()
+function sc_bugtrack_adminfield ()
 {
-global $tp,$bugtrack_admincomment;
-$retval='<textarea class="tbox" name="bugtrack_admincomment" cols="50" rows="6" style="width:80%">'.$tp->toFORM($bugtrack_admincomment).'</textarea>';
+global $bugtrack_admincomment;
+$retval='<textarea class="tbox" name="bugtrack_admincomment" cols="50" rows="6" style="width:80%">'.$this->tp->toFORM($bugtrack_admincomment).'</textarea>';
 return $retval;
 }
 
-function sc_BUGTRACK_ASSIGNFIELD ()
+function sc_bugtrack_assignfield ()
 {
-global $tp,$BUGTRACK_PREF,$sql,$bugtrack_assigned;
+global $BUGTRACK_PREF,$bugtrack_assigned;
 $retval='<select class="tbox" name="bugtrack_assigned">';
 	$retval.='<option value="0" '.($bugtrack_assigned==0?'selected="selected"':'').'>'.BUGTRACK_51.'</option>';
-$sql->db_Select('user','user_name,user_id',"where find_in_set('".$BUGTRACK_PREF['bugtrack_devclass']."',user_class) order by user_name",'nowhere',false);
+$this->sql->db_Select('user','user_name,user_id',"where find_in_set('".$BUGTRACK_PREF['bugtrack_devclass']."',user_class) order by user_name",'nowhere',false);
 
-while ($row=$sql->db_Fetch())
+while ($row=$this->sql->db_Fetch())
 {
 	extract($row);
-	$retval.='<option value="'.$user_id.'"  '.($bugtrack_assigned==$user_id?'selected="selected"':'').'>'.$tp->toDB($user_name).'</option>';
+	$retval.='<option value="'.$user_id.'"  '.($bugtrack_assigned==$user_id?'selected="selected"':'').'>'.$this->tp->toDB($user_name).'</option>';
 
 }
 $retval.='</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_SUBMIT_BUTTON ()
+function sc_bugtrack_submit_button ()
 {
-return '<input type="submit" class="tbox" name="bugtrack_submit" value="' . BUGTRACK_43 . '" />';
+//////////return '<input type="submit" class="btn btn-primary" name="bugtrack_submit" value="' . BUGTRACK_43 . '" />';
+return $this->frm->admin_button('bugtrack_submit', BUGTRACK_43, 'submit');
+
 }
 
-function sc_BUGTRACK_FLAGFIELD ()
+function sc_bugtrack_flagfield ()
 {
-global $tp,$bugtrack_flag,$bugtrack_flagarray;
+global $bugtrack_flag,$bugtrack_flagarray;
 
 $retval = '<select class="tbox" name="bugtrack_flag">';
 $i=0;
@@ -186,9 +233,9 @@ $retval .= '</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_RESFIELD ()
+function sc_bugtrack_resfield ()
 {
-global $tp,$bugtrack_resolution,$bugtrack_resarray;
+global $bugtrack_resolution,$bugtrack_resarray;
 
 $retval = '<select class="tbox" name="bugtrack_resolution">';
 $i=0;
@@ -201,9 +248,9 @@ $retval .= '</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_STATUSFIELD ()
+function sc_bugtrack_statusfield ()
 {
-global $tp,$bugtrack_status,$bugtrack_statusarray;
+global $bugtrack_status,$bugtrack_statusarray;
 
 $retval = '<select class="tbox" name="bugtrack_status">';
 $i=0;
@@ -216,7 +263,7 @@ $retval .= '</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_INSERTID ()
+function sc_bugtrack_insertid ()
 {
 global $bugtrak_inserted;
 if ($bugtrak_inserted>0)
@@ -234,25 +281,31 @@ else
 
 }
 
-function sc_BUGTRACK_DESCFIELD ()
+function sc_bugtrack_descfield ()
 {
-global $tp,$bugtrack_name;
-return '<input type="text" style="width:80%" class="tbox" name="bugtrack_name" value="'.$tp->toFORM($bugtrack_name).'" />';
+/////////////global $bugtrack_name;
+/////////////return '<input type="text" style="width:80%" class="tbox" name="bugtrack_name" value="'.$this->tp->toFORM($bugtrack_name).'" />';
+global $bugtrack_name;
+return $this->frm->text("bugtrack_name", $this->tp->toFORM($bugtrack_name));
 }
 
-function sc_BUGTRACK_EXFIELD ()
+function sc_bugtrack_exfield ()
 {
-global $tp,$bugtrack_exampleurl;
-return '<input type="text" style="width:80%" class="tbox" name="bugtrack_exampleurl" value="'.$tp->toFORM($bugtrack_exampleurl).'" />';
+/////////////global $bugtrack_exampleurl;
+/////////////return '<input type="text" style="width:80%" class="tbox" name="bugtrack_exampleurl" value="'.$this->tp->toFORM($bugtrack_exampleurl).'" />';
+global $bugtrack_exampleurl;
+return $this->frm->text("bugtrack_exampleurl", $this->tp->toFORM($bugtrack_exampleurl));
 }
 
-function sc_BUGTRACK_MAINFIELD ()
+function sc_bugtrack_mainfield ()
 {
-global $tp,$bugtrack_body;
-return '<textarea class="tbox" style="width:80%;" cols="50" rows="6" name="bugtrack_body">'.$tp->toFORM($bugtrack_body).'</textarea>';
+///////////////global $bugtrack_body;
+///////////////return '<textarea class="tbox" style="width:80%;" cols="50" rows="6" name="bugtrack_body">'.$this->tp->toFORM($bugtrack_body).'</textarea>';
+global $bugtrack_body;
+return $this->frm->textarea("bugtrack_body", $this->tp->toFORM($bugtrack_body));
 }
 
-function sc_BUGTRACK_PRIORITYFIELD ()
+function sc_bugtrack_priorityfield ()
 {
 global $bugtrack_priority;
 if (!is_numeric($bugtrack_priority))
@@ -273,25 +326,26 @@ return '<select class="tbox" name="bugtrack_priority">
 </select>';
 }
 
-function sc_BUGTRACK_APPSEL ()
+function sc_bugtrack_appsel ()
 {
-global $sql,$tp,$bugtrack_bugapp;
+global $bugtrack_bugapp;
 $retval ='<select name="bugtrack_category" class="tbox">';
-if ($sql->db_Select('bugtrack_apps','bugtrack_app_id,bugtrack_app_name','order by bugtrack_app_name','nowhere',false))
+if ($this->sql->db_Select('bugtrack_apps','bugtrack_app_id,bugtrack_app_name','order by bugtrack_app_name','nowhere',false))
 {
-	while ($row=$sql->db_Fetch())
+	while ($row=$this->sql->db_Fetch())
 	{
 	extract($row);
-	$retval .= '<option value="'.$bugtrack_app_id.'" '.($bugtrack_app_id==$bugtrack_bugapp?'selected="selected"':'').'>'.$tp->toFORM($bugtrack_app_name).'</option>';
+	$retval .= '<option value="'.$bugtrack_app_id.'" '.($bugtrack_app_id==$bugtrack_bugapp?'selected="selected"':'').'>'.$this->tp->toFORM($bugtrack_app_name).'</option>';
 	}
 }
 $retval .='</select>';
 return $retval;
 }
 
-function sc_BUGTRACK_SUBMITNEW ($parm=null)
+function sc_bugtrack_submitnew ($parm=null)
 {
 global $BUGTRACK_PREF,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
+
 if (check_class($BUGTRACK_PREF['bugtrack_submitclass']) || check_class($BUGTRACK_PREF['bugtrack_devclass']) || check_class($BUGTRACK_PREF['bugtrack_adminclass']) )
 {
 	if ($parm=='text')
@@ -303,6 +357,15 @@ if (check_class($BUGTRACK_PREF['bugtrack_submitclass']) || check_class($BUGTRACK
 		$retval = "<a href='".e_SELF."?$bugtrack_from.new.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf' ><img src='".BUGTRACK_IMAGES."/images/bugtrack_small.png' alt='".BUGTRACK_78."' title='".BUGTRACK_78."' style='border:0;'/></a>";
 
 	}
+	elseif ($parm=='button')
+	{
+		$retval = "<a href='".e_SELF."?$bugtrack_from.new.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf' class='pager-button btn btn-primary hidden-print align-self-center mb-0'>".BUGTRACK_27."</a>";
+
+	}
+    elseif ($parm=='link')
+	{
+		$retval = e_SELF.'?{$bugtrack_from}.new.{$bugtrack_bugapp}.{$bugtrack_bugid}.{$bugtrack_tmpf}';
+	}
 	else
 	{
 		$retval = "<a href='".e_SELF."?$bugtrack_from.new.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf' ><img src='".BUGTRACK_IMAGES."/images/bugtracknew.png' alt='".BUGTRACK_78."' title='".BUGTRACK_78."' style='border:0;'/></a>";
@@ -311,107 +374,114 @@ if (check_class($BUGTRACK_PREF['bugtrack_submitclass']) || check_class($BUGTRACK
 return $retval;
 }
 
-function sc_BUGTRACK_OPTIONS ()
+function sc_bugtrack_options ()
 {
 global $BUGTRACK_PREF,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
 if (check_class($BUGTRACK_PREF['bugtrack_devclass']) || check_class($BUGTRACK_PREF['bugtrack_adminclass']))
 {
-	$retval = "<a href='".e_SELF."?$bugtrack_from.opt.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf' >".BUGTRACK_26."</a>";
+	$retval = "<a class='btn' href='".e_SELF."?$bugtrack_from.opt.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf' >".BUGTRACK_26."</a>";
 }
 return $retval;
 }
 
-function sc_BUGTRACK_POSTED ($parm=null)
+function sc_bugtrack_posted ($parm=null)
 {
-global $tp,$bugtrack_gen,$bugtrack_posted;
+global $bugtrack_gen,$bugtrack_posted;
 if ($parm=='long' || $parm=='short')
 {
-	return $tp->toHTML($bugtrack_gen->convert_date($bugtrack_posted,$parm),false);
+	return $this->tp->toHTML($bugtrack_gen->convert_date($bugtrack_posted,$parm),false);
 }
 else
 {
 	if (empty($parm))
 	{
-	return $tp->toHTML(date('d-m-Y',$bugtrack_posted),false);
+	return $this->tp->toHTML(date('d-m-Y',$bugtrack_posted),false);
 	}
 	else
 	{
-	return $tp->toHTML(date($parm,$bugtrack_posted),false);
+	return $this->tp->toHTML(date($parm,$bugtrack_posted),false);
 	}
 }
 }
 
-function sc_BUGTRACK_RESOLUTION ()
+function sc_bugtrack_resolution ()
 {
-global $tp,$bugtrack_resarray,$bugtrack_resolution;
-return $tp->toHTML($bugtrack_resarray[$bugtrack_resolution],false);
+global $bugtrack_resarray,$bugtrack_resolution;
+return $this->tp->toText($bugtrack_resarray[$bugtrack_resolution]);
+//return $bugtrack_resarray[$bugtrack_resolution];
+}
+
+function sc_bugtrack_flag ()
+{
+global $bugtrack_flagarray,$bugtrack_flag;
+return $this->tp->toHTML($bugtrack_flagarray[$bugtrack_flag],false);
 
 }
 
-function sc_BUGTRACK_FLAG ()
+function sc_bugtrack_admincomment ()
 {
-global $tp,$bugtrack_flagarray,$bugtrack_flag;
-return $tp->toHTML($bugtrack_flagarray[$bugtrack_flag],false);
-
+global $bugtrack_admincomment;
+return $this->tp->toHTML($bugtrack_admincomment,false);
 }
 
-function sc_BUGTRACK_ADMINCOMMENT ()
+function sc_bugtrack_devcomment ()
 {
-global $tp,$bugtrack_admincomment;
-return $tp->toHTML($bugtrack_admincomment,false);
+global $bugtrack_devcomment;
+return $this->tp->toHTML($bugtrack_devcomment,false);
 }
 
-function sc_BUGTRACK_DEVCOMMENT ()
+function sc_bugtrack_explain ()
 {
-global $tp,$bugtrack_devcomment;
-return $tp->toHTML($bugtrack_devcomment,false);
+global $bugtrack_body;
+return $this->tp->toHTML($bugtrack_body,false);
 }
 
-function sc_BUGTRACK_EXPLAIN ()
+function sc_bugtrack_exampleurl ()
 {
-global $tp,$bugtrack_body;
-return $tp->toHTML($bugtrack_body,false);
+global $bugtrack_exampleurl;
+return $this->tp->toHTML($bugtrack_exampleurl,false);
 }
 
-function sc_BUGTRACK_EXAMPLEURL ()
+function sc_bugtrack_name ($parm=null)
 {
-global $tp,$bugtrack_exampleurl;
-return $tp->toHTML($bugtrack_exampleurl,false);
-}
-
-function sc_BUGTRACK_NAME ($parm=null)
-{
-global $tp,$bugtrack_name,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
+global $bugtrack_name,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
 if ($parm=='link')
 {
-	return '<a href="'.e_SELF."?$bugtrack_from.item.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf\" >".$tp->toHTML($bugtrack_name,false).'</a>';
+	return '<a href="'.e_SELF."?$bugtrack_from.item.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf\" >".$this->tp->toText($bugtrack_name).'</a>';
+//	return '<a href="'.e_SELF."?{$bugtrack_from}.item.{$bugtrack_bugapp}.{$bugtrack_bugid}.{$bugtrack_tmpf}\" >".$bugtrack_name.'</a>';
 }
 else
 {
-	return $tp->toHTML($bugtrack_name,false);
+	return $this->tp->toText($bugtrack_name);
+//	return $bugtrack_name;
 }
 }
 
-function sc_BUGTRACK_POSTER ()
+
+function sc_bugtrack_poster ()
 {
-global $tp,$bugtrack_aname;
-return $tp->toHTML($bugtrack_aname,false);
+global $bugtrack_aname;
+return $this->tp->toText($bugtrack_aname);
+//return $bugtrack_aname;
 }
 
-function sc_BUGTRACK_STATUS ()
+
+function sc_bugtrack_status ()
 {
-global $tp,$bugtrack_statusarray,$bugtrack_status;
+global $bugtrack_statusarray,$bugtrack_status;
 if (!is_numeric($bugtrack_status))
 {
 	$bugtrack_status=0;
 }
 $bugtrack_temp=$bugtrack_statusarray[$bugtrack_status];
-return $tp->toHTML($bugtrack_temp,false);
+return $this->tp->toText($bugtrack_temp);
+//return $bugtrack_temp;
 }
 
-function sc_BUGTRACK_ASSIGNEE ()
+
+function sc_bugtrack_assignee ()
 {
-global $tp,$user_name;
+global $user_name;
 if (empty($user_name))
 {
 $bugtrack_uname=BUGTRACK_21;
@@ -420,29 +490,32 @@ else
 {
 $bugtrack_uname=$user_name;
 }
-return $tp->toHTML($bugtrack_uname,false);
+return $this->tp->toText($bugtrack_uname);
 }
 
-function sc_BUGTRACK_PRIORITY ($parm=null)
+
+function sc_bugtrack_priority ($parm=null)
 {
-global $tp,$bugtrack_priority,$bugtrack_colourarray;
-if ($parm==nocolour)
+global $bugtrack_priority,$bugtrack_colourarray;
+if ($parm=="nocolour")
 {
-$retval=$tp->toHTML($bugtrack_priority,false);
+$retval=$this->tp->toText($bugtrack_priority);
+//$retval=$bugtrack_priority;
 }
 else
 {
-$retval='<div style="background-color:'.$bugtrack_colourarray[$bugtrack_priority].'">'.$tp->toHTML($bugtrack_priority,false).'</div>';
+$retval='<div style="background-color:'.$bugtrack_colourarray[$bugtrack_priority].'">'.$this->tp->toText($bugtrack_priority).'</div>';
+//$retval='<div style="background-color:'.$bugtrack_colourarray[$bugtrack_priority].'">'.$bugtrack_priority.'</div>';
 }
 return $retval;
 }
 
-function sc_BUGTRACK_ICON ()
+function sc_bugtrack_icon ()
 {
 global $bugtrack_app_icon,$tp;
 if (!empty($bugtrack_app_icon) )
 {
-	return '<img src="'.BUGTRACK_IMAGES.'/icons/'.$tp->toFORM($bugtrack_app_icon).'" style="width:48px;height:48px;border:0;" alt="icon" />';
+	return '<img src="'.BUGTRACK_IMAGES.'/icons/'.$this->tp->toFORM($bugtrack_app_icon).'" style="width:48px;height:48px;border:0;" alt="icon" />';
 }
 else
 {
@@ -450,52 +523,73 @@ else
 }
 }
 
-function sc_BUGTRACK_APPNAME ($parm=null)
+function sc_bugtrack_appname ($parm=null)
 {
-global $tp,$bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
+/////global $bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugid,$bugtrack_from;
+/*
+var_dump($this->var['bugtrack_app_id']);
+var_dump($this->var['bugtrack_bugid']);
+var_dump($this->var['bugtrack_from']);
+var_dump($this->var['bugtrack_app_name']);
+echo "<hr>";
+*/
+//var_dump($this->var['bugtrack_app_id']);
+//var_dump($this->var['bugtrack_app_name']);
+//////return $this->tp->toHTML($bugtrack_app_name,false);
+$app_name = $this->tp->toText($this->var['bugtrack_app_name']);
+//return $this->var['bugtrack_app_name'];
 if ($parm=='link')
 {
-return "<a href='".e_SELF."?0.view.$bugtrack_app_id.$bugtrack_bugid.$bugtrack_from'>".$tp->toHTML($bugtrack_app_name,false)."</a>";
+    return "<a href='".e_SELF."?0.view.{$this->var['bugtrack_app_id']}.{$this->var['bugtrack_bugid']}.{$this->var['bugtrack_from']}'>".$app_name."</a>";
 }
 else
 {
-return $tp->toHTML($bugtrack_app_name,false);
+    return $app_name;
 }
 }
 
-function sc_BUGTRACK_APPDESC ()
+function sc_bugtrack_appdesc ()
 {
-global $tp,$bugtrack_app_description;
-return $tp->toHTML($bugtrack_app_description,false);
+global $bugtrack_app_description;
+return $this->tp->toHTML($bugtrack_app_description,false);
 }
 
-function sc_BUGTRACK_OPEN ()
+function sc_bugtrack_open ()
 {
-global $tp,$bugtrack_open;
-return str_pad($tp->toHTML($bugtrack_open,false),1,'0');
+//global $bugtrack_open;
+//return str_pad($this->tp->toHTML($bugtrack_open,false),1,'0');
+    return str_pad($this->tp->toHTML($this->var['open_bugs']),1,'0');
+//    return str_pad($this->tp->toHTML($this->bugStats['open']),1,'0');
 }
 
-function sc_BUGTRACK_CLOSED ()
+function sc_bugtrack_closed ()
 {
-global $tp,$bugtrack_closed;
-return str_pad($tp->toHTML($bugtrack_closed,false),1,'0');
+//global $bugtrack_closed;
+//return str_pad($this->tp->toHTML($bugtrack_closed,false),1,'0');
+    return str_pad($this->tp->toHTML($this->var['closed_bugs']),1,'0');
+//    return str_pad($this->tp->toHTML($this->bugStats['closed']),1,'0');
 }
 
-function sc_BUGTRACK_PENDING ()
+function sc_bugtrack_pending ()
 {
-global $tp,$bugtrack_pending;
-return str_pad($tp->toHTML($bugtrack_pending,false),1,'0');
+//global $bugtrack_pending;
+//return str_pad($this->tp->toHTML($bugtrack_pending,false),1,'0');
+    return str_pad($this->tp->toHTML($this->var['pending_bugs']),1,'0');
+//    return str_pad($this->tp->toHTML($this->bugStats['pending']),1,'0');
 }
 
-function sc_BUGTRACK_TOTAL ()
+function sc_bugtrack_total ()
 {
-global $tp,$bugtrack_total;
-return str_pad($tp->toHTML($bugtrack_total,false),1,'0');
+//global $bugtrack_total;
+//return str_pad($this->tp->toHTML($bugtrack_total,false),1,'0');
+    return str_pad($this->tp->toHTML($this->var['open_bugs'] + $this->var['closed_bugs'] + $this->var['pending_bugs']),1,'0');
+//    $bugtrack_total = $bugtrack_open + $bugtrack_closed + $bugtrack_pending;
+//    return str_pad($this->tp->toHTML($this->bugStats['open'] + $this->bugStats['closed'] + $this->bugStats['pending']),1,'0');
 }
 
-function sc_BUGTRACK_SHOW_UP ($parm=null)
+function sc_bugtrack_show_up ($parm=null)
 {
-global $tp,$bugtrack_action,$bugtrack_app_name,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
+global $bugtrack_action,$bugtrack_app_name,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from,$bugtrack_tmpf;
 $bugtrack_newfrom=$bugtrack_from;
 switch ($bugtrack_action)
 {
@@ -522,45 +616,53 @@ if ($bugtrack_newaction=='show')
 }
 if ($parm=='noicon')
 {
-	return "<a href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'>".BUGTRACK_28 . "</a>";
+///////	return "<a class='btn' href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'>".BUGTRACK_28 . "</a>";
+	return "<a class='btn' href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'>".LAN_BACK."</a>";
+////    return $this->frm->renderValue(LAN_BACK, array("link"=>e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'"));
 }
 else
 {
-	return "<a href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'><img src='".BUGTRACK_IMAGES."/images/updir.png' style='border:0;' alt='" . BUGTRACK_28 . "' title='" . BUGTRACK_28 . "' /></a>";
+///////	return "<a href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'><img src='".BUGTRACK_IMAGES."/images/updir.png' style='border:0;' alt='" . BUGTRACK_28 . "' title='" . BUGTRACK_28 . "' /></a>";
+	return "<a class='btn'  href='".e_SELF."?$bugtrack_newfrom.$bugtrack_newaction.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf'><img src='".BUGTRACK_IMAGES."/images/updir.png' style='border:0;' alt='" . LAN_BACK . "' title='" . LAN_BACK . "' /></a>";
 }
 }
 
-function sc_BUGTRACK_SHOW_PRINT ($parm=null)
+function sc_bugtrack_show_print ($parm=null)
 {
-global $tp,$bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from;
+global $bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from;
 if ($parm=='noicon')
 {
-return "<a href='../../print.php?plugin:bug_tracker.$bugtrack_bugid' >" . BUGTRACK_29 . "</a>";
+return "<a class='btn' href='../../print.php?plugin:bug_tracker.$bugtrack_bugid' >" . BUGTRACK_29 . "</a>";
 }
 else
 {
-return "<a href='../../print.php?plugin:bug_tracker.$bugtrack_bugid' ><img src='" . e_IMAGE . "generic/" . IMODE . "/printer.png' style='border:0;' title='" . BUGTRACK_29 . "' alt='" . BUGTRACK_29 . "' /></a>";
+return "<a class='btn' href='../../print.php?plugin:bug_tracker.$bugtrack_bugid' ><img src='" . e_IMAGE . "generic/" . IMODE . "/printer.png' style='border:0;' title='" . BUGTRACK_29 . "' alt='" . BUGTRACK_29 . "' /></a>";
 
 }
 
 }
 
-function sc_BUGTRACK_SHOW_EMAIL ($parm=null)
+function sc_bugtrack_show_email ($parm=null)
 {
-global $tp,$bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from;
+global $bugtrack_app_name,$bugtrack_app_id,$bugtrack_bugapp,$bugtrack_bugid,$bugtrack_from;
 if ($parm=="noicon")
 {
-	return "<a href='../../email.php?plugin:bug_tracker." . $bugtrack_bugid . "'>".BUGTRACK_30 . "</a>";
+	return "<a class='btn' href='../../email.php?plugin:bug_tracker." . $bugtrack_bugid . "'>".BUGTRACK_30 . "</a>";
 }
 else
 {
-	return "<a href='../../email.php?plugin:bug_tracker." . $bugtrack_bugid . "'><img src='" . e_IMAGE . "generic/" . IMODE . "/email.png' style='border:0' alt='" . BUGTRACK_30 . "' title='" . BUGTRACK_30 . "' /></a>";
+	return "<a class='btn' href='../../email.php?plugin:bug_tracker." . $bugtrack_bugid . "'><img src='" . e_IMAGE . "generic/" . IMODE . "/email.png' style='border:0' alt='" . BUGTRACK_30 . "' title='" . BUGTRACK_30 . "' /></a>";
 }
 }
 
+
+
+
+
+/*
 function sc_JOKE_CAT_SEL ($parm=null)
 {
-global $row, $tp, $bugtrack_db, $bugtrack_desc, $bugtrack_desc, $bugtrack_jokecat;
+global $row,  $bugtrack_db, $bugtrack_desc, $bugtrack_desc, $bugtrack_jokecat;
 
 $bugtrack_desc = BUGTRACK_109;
 print $parms;
@@ -694,7 +796,7 @@ if (strtolower($parm) != "none")
 {
     if (!$rater->checkrated("bugtrack", $bugtrack_id) && USER)
     {
-        $bugtrack_view_rating .= $rater->rateselect("<br /><b>" . BUGTRACK_85, "bugtrack", $bugtrack_id) . "</b>";
+        $bugtrack_view_rating .= $rater->rateselect("<br /><b>" . BUGTRACK_75, "bugtrack", $bugtrack_id) . "</b>";
     }
     else if (!USER)
     {
@@ -710,17 +812,17 @@ return $bugtrack_view_rating;
 
 function sc_JOKE_CAT_JOKELIST ()
 {
-global $tp, $bugtrack_id, $bugtrack_from, $bugtrack_jokecat, $bugtrack_jokeorder, $bugtrack_name, $bugtrack_view_rating;
-return "<a href='" . e_SELF . "?$bugtrack_from.view.$bugtrack_id.$bugtrack_jokecat.$bugtrack_jokeorder' >" . $tp->toHTML($bugtrack_name, false) . "</a><br />$bugtrack_view_rating";
+global  $bugtrack_id, $bugtrack_from, $bugtrack_jokecat, $bugtrack_jokeorder, $bugtrack_name, $bugtrack_view_rating;
+return "<a href='" . e_SELF . "?$bugtrack_from.view.$bugtrack_id.$bugtrack_jokecat.$bugtrack_jokeorder' >" . $this->tp->toHTML($bugtrack_name, false) . "</a><br />$bugtrack_view_rating";
 
 }
 
 function sc_JOKE_CAT_POSTLIST ()
 {
-global $tp, $bugtrack_author;
+global  $bugtrack_author;
 $bugtrack_poster = explode(".", $bugtrack_author);
 $bugtrack_postername = $bugtrack_poster[1];
-return $tp->toHTML($bugtrack_postername, false);
+return $this->tp->toHTML($bugtrack_postername, false);
 }
 
 function sc_JOKE_CAT_DATELIST ($parm=null)
@@ -732,33 +834,33 @@ return $bugtrack_posted;
 
 function sc_JOKE_CAT_SUBMIT ()
 {
-global $tp, $bugtrack_id, $bugtrack_from, $bugtrack_jokecat, $bugtrack_jokeorder;
+global  $bugtrack_id, $bugtrack_from, $bugtrack_jokecat, $bugtrack_jokeorder;
 return "<a href='?$bugtrack_from.submit.$bugtrack_jokeid.$bugtrack_jokecat.$bugtrack_jokeorder'>" . BUGTRACK_11 . "</a>";
 }
 
 function sc_JOKE_SHOW_NAME ()
 {
-global $tp, $bugtrack_name;
-return $tp->toHTML($bugtrack_name, false);
+global  $bugtrack_name;
+return $this->tp->toHTML($bugtrack_name, false);
 }
 
 function sc_JOKE_SHOW_BODY ()
 {
-global $tp, $bugtrack_body;
-return $tp->toHTML($bugtrack_body, true);
+global  $bugtrack_body;
+return $this->tp->toHTML($bugtrack_body, true);
 }
 
 function sc_JOKE_SHOW_POSTER ()
 {
-global $tp, $bugtrack_author;
+global  $bugtrack_author;
 $bugtrack_tmp=explode(".",$bugtrack_author);
 
-return $tp->toHTML($bugtrack_tmp[1], false);
+return $this->tp->toHTML($bugtrack_tmp[1], false);
 }
 
 function sc_JOKE_SUBMIT_RESULT ()
 {
-global $bugtrack_db, $BUGTRACK_PREF, $tp,$e_event;
+global $bugtrack_db, $BUGTRACK_PREF, $e_event;
 if (USER)
 {
     $bugtrack_username = USERID . "." . USERNAME;
@@ -771,9 +873,9 @@ else
 $bugtrack_approved = (check_class($BUGTRACK_PREF['bugtrack_autoclass'])?1:0);
 $bugtrack_args = "
 		'0',
-		'" . $tp->toDB($_POST['bugtrack_name']) . "',
-		'" . $tp->toDB($bugtrack_username) . "',
-		'" . $tp->toDB($_POST['bugtrack_body']) . "',
+		'" . $this->tp->toDB($_POST['bugtrack_name']) . "',
+		'" . $this->tp->toDB($bugtrack_username) . "',
+		'" . $this->tp->toDB($_POST['bugtrack_body']) . "',
 		'" . $_POST['bugtrack_select'] . "',
 		'" . $bugtrack_approved . "',
 		'" . time()."'";
@@ -812,12 +914,12 @@ return "<input type='text' size='60%' maxlength='50' class='tbox' name='bugtrack
 
 function sc_JOKE_SUBMIT_BODY ()
 {
-global $tp,$BUGTRACK_PREF;
+global $BUGTRACK_PREF;
  require_once(e_HANDLER . "ren_help.php");
 
 $insertjs = (!$BUGTRACK_PREF['wysiwyg'])?"rows='10' onselect='storeCaret(this);' onclick='storeCaret(this);' onkeyup='storeCaret(this);'":
             "rows='20' style='width:100%' ";
-            $bugtrack_body = $tp->toForm($bugtrack_body);
+            $bugtrack_body = $this->tp->toForm($bugtrack_body);
             $retval .= "<textarea class='tbox' id='bugtrack_body' name='bugtrack_body' cols='80'  style='width:95%' $insertjs>" . (strstr($bugtrack_body, "[img]http") ? $bugtrack_body : str_replace("[img]../", "[img]", $bugtrack_body)) . "</textarea>";
             if (!$BUGTRACK_PREF['wysiwyg'])
             {
@@ -843,5 +945,5 @@ $retval .= "<a href='".e_BASE.$PLUGINS_DIRECTORY."rss_menu/rss.php?bugs.4{$bugtr
 return $retval;
 
 }
-
+*/
 }

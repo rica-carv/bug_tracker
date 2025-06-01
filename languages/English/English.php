@@ -102,7 +102,7 @@ define(BUGTRACK_81, 'Bug posted');
 define(BUGTRACK_82, 'Bug description');
 define(BUGTRACK_83, 'Application');
 define(BUGTRACK_84, 'by');
-define(BUGTRACK_85, 'Bug Tracker');
+define(BUGTRACK_85, 'Please come back later');
 
 define(BUGTRACK_RSS_1, 'Bug Tracker');
 define(BUGTRACK_RSS_2, 'RSS feed for the Bug Tracker');

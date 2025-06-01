@@ -93,7 +93,7 @@ define("BUGTRACK_72", 'Ainda não atribuido');
 define("BUGTRACK_73", 'Ir');
 define("BUGTRACK_74", 'Resolução');
 define("BUGTRACK_75", 'Bug Tracker');
-define("BUGTRACK_76", 'Não é premitido colocar relatórios de erros');
+define("BUGTRACK_76", 'Não é permitido colocar relatórios de erros');
 define("BUGTRACK_77", 'Nenhum desenvolvedor atribuido');
 define("BUGTRACK_78", 'Submeter novo erro');
 define("BUGTRACK_79", 'Nenhum erro encontrado');
@@ -102,13 +102,13 @@ define("BUGTRACK_81", 'Erro colocado');
 define("BUGTRACK_82", 'Descrição do erro');
 define("BUGTRACK_83", 'Aplicação');
 define("BUGTRACK_84", 'por');
-define("BUGTRACK_85", 'Bug Tracker');
+define("BUGTRACK_85", 'Por favor volte mais tarde.');
 
 define("BUGTRACK_RSS_1", 'Bug Tracker');
 define("BUGTRACK_RSS_2", 'RSS feed for the Bug Tracker');
 define("BUGTRACK_RSS_3", 'Restricted Access');
 define("BUGTRACK_RSS_4", 'The settings for the site do not permit you to view the bugs');
-define("BUGTRACK_RSS_5", 'No bugs found');
+define("BUGTRACK_RSS_5", 'Nenhum erro encontrado');
 define("BUGTRACK_RSS_6", 'There are no open bugs');
 define("BUGTRACK_RSS_7", 'Application');
 /*
