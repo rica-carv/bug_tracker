@@ -154,10 +154,13 @@ return  '<a href="'.$bugtrack_app_forum.'">'.BUGTRACK_57.'</a> ';
 
 function sc_bugtrack_listnp ($parms=null)
 {
-global  $bugtrack_npa,$bugtrack_tmpf,$bugtrack_perpage,$bugtrack_count,$bugtrack_action, $bugtrack_from, $bugtrack_bugid, $bugtrack_bugapp, $BUGTRACK_PREF;
+//global  $bugtrack_npa,$bugtrack_tmpf,$bugtrack_perpage,$bugtrack_count,$bugtrack_action, $bugtrack_from, $bugtrack_bugid, $bugtrack_bugapp, $BUGTRACK_PREF;
 
-$action = "$bugtrack_npa.$bugtrack_bugapp.$bugtrack_bugid.$bugtrack_tmpf";
-$parms = $bugtrack_count . ',' . $bugtrack_perpage . ',' . $bugtrack_from . ',' . e_SELF . '?' . '[FROM].' . $action;
+/////$action = "{$bugtrack_npa}.{$bugtrack_bugapp}.{$bugtrack_bugid}.{$bugtrack_tmpf}";
+/////$parms = $bugtrack_count . ',' . $bugtrack_perpage . ',' . $bugtrack_from . ',' . e_SELF . '?' . '[FROM].' . $action;
+////$parms = 'tmpl_prefix='.deftrue('BUGTRACK_NEXTPREV_TMPL', 'default').'&total='.$bugtrack_count.'&amount='.$bugtrack_perpage.'&current='.$bugtrack_from.'&url=?--FROM--.'.$action; // .'&url='.$url;
+$action = "{$this->var['bugtrack_npa']}.{$this->var['bugtrack_bugapp']}.{$this->var['bugtrack_bugid']}.{$this->var['bugtrack_tmpf']}";
+$parms = "tmpl_prefix=".deftrue('BUGTRACK_NEXTPREV_TMPL', 'default')."&total={$this->var['bugtrack_count']}&amount={$this->var['bugtrack_perpage']}&current={$this->var['bugtrack_from']}&url=?--FROM--.{$action}"; // .'&url='.$url;
 return $this->tp->parseTemplate("{NEXTPREV={$parms}}");
 }
 

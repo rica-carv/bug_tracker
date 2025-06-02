@@ -444,6 +444,8 @@ switch ($bugtrack_action)
                     $bugtrack_tmp = explode(".", $bugtrack_author);
                     $bugtrack_aname = $bugtrack_tmp[1];
 
+                    $bugs_shortcodes->addVars($bugtrack_row);
+
 //////////////                    $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_LIST, false, $bugs_shortcodes);
                     $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_LIST'], false, $bugs_shortcodes);
                 }
@@ -455,9 +457,16 @@ switch ($bugtrack_action)
 			<td class="forumheader3" colspan="7" style="width:30%;vertical-align:top;">' . BUGTRACK_55 . '</td>
 		</tr>';
             }
-            $bugtrack_count = $sql->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_bugapp, false);
-            $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_perpage'];
-            $bugtrack_npa = 'view';
+            $bugtrack_count = $sql->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_category=' . $bugtrack_bugapp, false);// PAtra tirar adepois
+            $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_perpage'];// PAtra tirar adepois
+            $bugtrack_npa = 'view'; // PAtra tirar adepois
+
+            $row['bugtrack_count'] = $sql->count('bugtrack_bugs', '(*)', 'bugtrack_category=' . $bugtrack_bugapp);
+            $row['bugtrack_perpage'] = $BUGTRACK_PREF['bugtrack_perpage'];
+            $row['bugtrack_npa'] = 'view';
+            $row['bugtrack_tmpf'] = $bugtrack_tmpf;
+            $bugs_shortcodes->addVars($row);
+
 //////////////            $bugtrack_text .= $tp->parseTemplate($BUGTRACK_SHOW_FOOTER, false, $bugs_shortcodes);
             $bugtrack_text .= $tp->parseTemplate($bugs_template['SHOW_FOOTER'], false, $bugs_shortcodes);
         }
@@ -521,6 +530,13 @@ switch ($bugtrack_action)
                     $bugtrack_count = $sql2->count('bugtrack_apps', '(*)');
                     $bugtrack_perpage = $BUGTRACK_PREF['bugtrack_inmenu'];
                     $bugtrack_npa = 'show';
+
+
+                    $row['bugtrack_count'] =  $sql2->count('bugtrack_apps', '(*)');
+                    $row['bugtrack_perpage'] = $BUGTRACK_PREF['bugtrack_inmenu'];
+                    $row['bugtrack_npa'] = 'show';
+                    $bugs_shortcodes->addVars($row);
+
                     $bugtrack_text .= $tp->parseTemplate($bugs_template['LIST_FOOTER'], false, $bugs_shortcodes);
 
                 }
@@ -541,10 +557,10 @@ switch ($bugtrack_action)
                 $bugtrack_page = BUGTRACK_9;
                 require_once(HEADERF);
 
-                ob_start();
+//                ob_start();
                 $ns->tablerender(BUGTRACK_1, $bugtrack_text);
-                $bugtrack_cache = ob_get_flush();
-                $e107cache->set('bugtrack', $bugtrack_cache);
+//                $bugtrack_cache = ob_get_flush();
+//                $e107cache->set('bugtrack', $bugtrack_cache);
             }
         }
 } // switch
