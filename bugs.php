@@ -4,7 +4,7 @@
 // *  Bug Tracker for e107 v7
 // *
 // **************************************************************************
-require_once('../../class2.php');
+require_once(__DIR__.'/../../class2.php');
 if (!defined('e107_INIT')){    exit;}
 
 $msg = e107::getMessage();

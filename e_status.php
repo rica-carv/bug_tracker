@@ -15,7 +15,7 @@ if (!defined('e107_INIT'))
 {
     exit;
 }
-include_lan(e_PLUGIN . 'bug_tracker/languages/' . e_LANGUAGE . '.php');
+e107::lan('bug_tracker');
 $bugtrack_posts = $sql->db_Count('bugtrack_bugs', '(*)');
 $bugtrack_undef = $sql->db_Count('bugtrack_bugs', '(*)', 'where bugtrack_status=1');
 if (empty($bugtrack_posts))
@@ -24,5 +24,3 @@ if (empty($bugtrack_posts))
 }
 $text .= '<div style="padding-bottom: 2px;"><img src="' . e_PLUGIN . 'bug_tracker/images/bugtrack_16.png" style="width: 16px; height: 16px; vertical-align: bottom;border:0;" alt="" /> ' . BUGTRACK_A119 . ': ' . $bugtrack_posts . '</div>';
 $text .= '<div style="padding-bottom: 2px;"><img src="' . e_PLUGIN . 'bug_tracker/images/bugtrack_16.png" style="width: 16px; height: 16px; vertical-align: bottom;border:0;" alt="" /> ' . BUGTRACK_A120 . ': ' . $bugtrack_undef . '</div>';
-
-?>

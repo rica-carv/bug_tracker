@@ -11,7 +11,8 @@
 |
 +---------------------------------------------------------------+
 */
-require_once('../../class2.php');
+require_once(__DIR__.'/../../class2.php');
+
 if (!defined('e107_INIT'))
 {
     exit;
@@ -61,25 +62,28 @@ $bugtrack_text .= '
 		<tr><td colspan="2" class="fcaption">' . BUGTRACK_A1 . '</td></tr>
 		<tr><td colspan="2" class="forumheader2">' . $bugtrack_msgtext . '&nbsp;</td></tr>';
 // Main admin class
+require_once(e_HANDLER.'userclass_class.php');
+$e_userclass = new user_class();
+
 $bugtrack_text .= '
 		<tr>
 			<td style="width:30%" class="forumheader3">' . BUGTRACK_A5 . '</td>
-			<td style="width:70%" class="forumheader3">' . r_userclass('bugtrack_readclass', $BUGTRACK_PREF['bugtrack_readclass'], 'off', 'guest,public,member,nobody,main,admin,classes') . '</td>
+			<td style="width:70%" class="forumheader3">' . $e_userclass->uc_dropdown('bugtrack_readclass', $BUGTRACK_PREF['bugtrack_readclass'], 'guest,public,member,nobody,main,admin,classes') . '</td>
 		</tr>';
 $bugtrack_text .= '
 		<tr>
 			<td style="width:30%" class="forumheader3">' . BUGTRACK_A6 . '</td>
-			<td style="width:70%" class="forumheader3">' . r_userclass('bugtrack_submitclass', $BUGTRACK_PREF['bugtrack_submitclass'], 'off', 'public,nobody,member,main,admin,classes') . '</td>
+			<td style="width:70%" class="forumheader3">' . $e_userclass->uc_dropdown('bugtrack_submitclass', $BUGTRACK_PREF['bugtrack_submitclass'], 'public,nobody,member,main,admin,classes') . '</td>
 		</tr>';
 $bugtrack_text .= '
 		<tr>
 			<td style="width:30%" class="forumheader3">' . BUGTRACK_A83 . '</td>
-			<td style="width:70%" class="forumheader3">' . r_userclass('bugtrack_adminclass', $BUGTRACK_PREF['bugtrack_adminclass'], 'off', 'nobody,main,admin,classes') . '</td>
+			<td style="width:70%" class="forumheader3">' . $e_userclass->uc_dropdown('bugtrack_adminclass', $BUGTRACK_PREF['bugtrack_adminclass'], 'nobody,main,admin,classes') . '</td>
 		</tr>';
 $bugtrack_text .= '
 		<tr>
 			<td style="width:30%" class="forumheader3">' . BUGTRACK_A44 . '</td>
-			<td style="width:70%" class="forumheader3">' . r_userclass('bugtrack_devclass', $BUGTRACK_PREF['bugtrack_devclass'], 'off', 'nobody,classes') . '</td>
+			<td style="width:70%" class="forumheader3">' . $e_userclass->uc_dropdown('bugtrack_devclass', $BUGTRACK_PREF['bugtrack_devclass'], 'nobody,classes') . '</td>
 		</tr>';
 // *
 // * Notifications
